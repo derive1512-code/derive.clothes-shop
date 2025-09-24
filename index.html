@@ -14,6 +14,26 @@
     section.active { display:block; }
     h2 { border-bottom:2px solid #444; padding-bottom:10px; margin-bottom:20px; }
 
+    /* Carrusel genérico */
+    .carousel { position:relative; max-width:800px; margin:auto; overflow:hidden; border-radius:10px; }
+    .carousel img { width:100%; display:none; border-radius:10px; }
+    .carousel img.active { display:block; }
+    .carousel button {
+      position:absolute; top:50%; transform:translateY(-50%);
+      background:rgba(0,0,0,0.5); color:#fff; border:none; padding:10px;
+      cursor:pointer; border-radius:50%;
+    }
+    .carousel button:hover { background:rgba(0,0,0,0.8); }
+    .carousel .prev { left:10px; }
+    .carousel .next { right:10px; }
+
+    /* Redes sociales */
+    .socials { margin-top:20px; display:flex; gap:20px; justify-content:center; }
+    .socials a { display:flex; align-items:center; gap:10px; background:#222; padding:10px 20px; border-radius:30px; color:#fff; text-decoration:none; transition:0.3s; }
+    .socials a:hover { background:#444; }
+    .socials img { width:24px; height:24px; }
+
+    /* Productos */
     .products { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; }
     .product { background:#222; padding:15px; border-radius:10px; text-align:center; }
     .product h3 { margin-bottom:15px; }
@@ -28,29 +48,71 @@
     .remove-btn:hover { background:darkred; }
 
     #cart-total { margin-top:15px; font-weight:bold; }
+    .payment { text-align:center; }
+    .payment img { max-width:200px; margin:10px; border:2px solid #fff; border-radius:8px; }
   </style>
 </head>
 <body>
+  <!-- Encabezado con logo -->
   <header>
     <img src="img/logo.png" alt="Logo de la marca">
   </header>
 
+  <!-- Navegación -->
   <nav>
     <a href="#" onclick="showSection('inicio')">Inicio</a>
     <a href="#" onclick="showSection('productos')">Productos</a>
     <a href="#" onclick="showSection('carrito')">Carrito</a>
   </nav>
 
+  <!-- Sección Inicio -->
   <section id="inicio" class="active">
     <h2>Bienvenido a nuestra tienda</h2>
-    <p>Explora nuestros modelos y encuentra tu estilo. 👕</p>
+    <div class="carousel" id="inicio-carousel">
+      <img src="img/inicio1.jpg" class="active" alt="Foto inicio 1">
+      <img src="img/inicio2.jpg" alt="Foto inicio 2">
+      <img src="img/inicio3.jpg" alt="Foto inicio 3">
+      <img src="img/inicio4.jpg" alt="Foto inicio 4">
+      <img src="img/inicio5.jpg" alt="Foto inicio 5">
+      <img src="img/inicio6.jpg" alt="Foto inicio 6">
+      <img src="img/inicio7.jpg" alt="Foto inicio 7">
+      <img src="img/inicio8.jpg" alt="Foto inicio 8">
+      <img src="img/inicio9.jpg" alt="Foto inicio 9">
+      <img src="img/inicio10.jpg" alt="Foto inicio 10">
+      <img src="img/inicio11.jpg" alt="Foto inicio 11">
+      <img src="img/inicio12.jpg" alt="Foto inicio 12">
+      <img src="img/inicio13.jpg" alt="Foto inicio 13">
+      <img src="img/inicio14.jpg" alt="Foto inicio 14">
+      <button class="prev" onclick="moveSlide('inicio-carousel', -1)">❮</button>
+      <button class="next" onclick="moveSlide('inicio-carousel', 1)">❯</button>
+    </div>
+
+    <div class="socials">
+      <a href="https://www.instagram.com/derive_clothesz" target="_blank">
+        <img src="img/instagram.png" alt="Instagram"> @derive_clothesz
+      </a>
+      <a href="https://www.tiktok.com/@derive_clothesz" target="_blank">
+        <img src="img/tiktok.png" alt="TikTok"> @derive_clothesz
+      </a>
+    </div>
   </section>
 
+  <!-- Sección Productos -->
   <section id="productos">
     <h2>Productos</h2>
     <div class="products">
+      
+      <!-- Drift into adventure -->
       <div class="product">
         <h3>Drift into adventure shirt</h3>
+        <div class="carousel" id="drift-carousel">
+          <img src="img/drift1.jpg" class="active" alt="Drift 1">
+          <img src="img/drift2.jpg" alt="Drift 2">
+          <img src="img/drift3.jpg" alt="Drift 3">
+          <img src="img/drift4.jpg" alt="Drift 4">
+          <button class="prev" onclick="moveSlide('drift-carousel', -1)">❮</button>
+          <button class="next" onclick="moveSlide('drift-carousel', 1)">❯</button>
+        </div>
         <p>Precio: S/ 54.90</p>
         <select id="drift-size">
           <option value="S">Talla S</option>
@@ -60,8 +122,17 @@
         <button onclick="addToCart('Drift into adventure shirt', 54.90, document.getElementById('drift-size').value)">Agregar al carrito</button>
       </div>
 
+      <!-- True style -->
       <div class="product">
         <h3>True style shirt</h3>
+        <div class="carousel" id="true-carousel">
+          <img src="img/true1.jpg" class="active" alt="True 1">
+          <img src="img/true2.jpg" alt="True 2">
+          <img src="img/true3.jpg" alt="True 3">
+          <img src="img/true4.jpg" alt="True 4">
+          <button class="prev" onclick="moveSlide('true-carousel', -1)">❮</button>
+          <button class="next" onclick="moveSlide('true-carousel', 1)">❯</button>
+        </div>
         <p>Precio: S/ 54.90</p>
         <select id="true-size">
           <option value="S">Talla S</option>
@@ -71,19 +142,36 @@
         <button onclick="addToCart('True style shirt', 54.90, document.getElementById('true-size').value)">Agregar al carrito</button>
       </div>
 
+      <!-- Strive for the future -->
       <div class="product">
         <h3>Strive for the future shirt</h3>
-        <p>Precio: S/ 54.90</p>
+        <div class="carousel" id="strive-carousel">
+          <img src="img/strive1.jpg" class="active" alt="Strive 1">
+          <img src="img/strive2.jpg" alt="Strive 2">
+          <img src="img/strive3.jpg" alt="Strive 3">
+          <button class="prev" onclick="moveSlide('strive-carousel', -1)">❮</button>
+          <button class="next" onclick="moveSlide('strive-carousel', 1)">❯</button>
+        </div>
+        <p>Precio: S/ 49.90</p>
         <select id="strive-size">
           <option value="S">Talla S</option>
           <option value="M">Talla M</option>
           <option value="L">Talla L</option>
         </select>
-        <button onclick="addToCart('Strive for the future shirt', 54.90, document.getElementById('strive-size').value)">Agregar al carrito</button>
+        <button onclick="addToCart('Strive for the future shirt', 49.90, document.getElementById('strive-size').value)">Agregar al carrito</button>
       </div>
 
+      <!-- Boundless style -->
       <div class="product">
         <h3>Boundless style shirt</h3>
+        <div class="carousel" id="boundless-carousel">
+          <img src="img/boundless1.jpg" class="active" alt="Boundless 1">
+          <img src="img/boundless2.jpg" alt="Boundless 2">
+          <img src="img/boundless3.jpg" alt="Boundless 3">
+          <img src="img/boundless4.jpg" alt="Boundless 4">
+          <button class="prev" onclick="moveSlide('boundless-carousel', -1)">❮</button>
+          <button class="next" onclick="moveSlide('boundless-carousel', 1)">❯</button>
+        </div>
         <p>Precio: S/ 54.90</p>
         <select id="boundless-size">
           <option value="S">Talla S</option>
@@ -93,19 +181,30 @@
         <button onclick="addToCart('Boundless style shirt', 54.90, document.getElementById('boundless-size').value)">Agregar al carrito</button>
       </div>
 
+      <!-- Pisco sour -->
       <div class="product">
         <h3>Pisco sour shirt</h3>
-        <p>Precio: S/ 54.90</p>
+        <div class="carousel" id="pisco-carousel">
+          <img src="img/pisco1.jpg" class="active" alt="Pisco 1">
+          <img src="img/pisco2.jpg" alt="Pisco 2">
+          <img src="img/pisco3.jpg" alt="Pisco 3">
+          <img src="img/pisco4.jpg" alt="Pisco 4">
+          <button class="prev" onclick="moveSlide('pisco-carousel', -1)">❮</button>
+          <button class="next" onclick="moveSlide('pisco-carousel', 1)">❯</button>
+        </div>
+        <p>Precio: S/ 59.90</p>
         <select id="pisco-size">
           <option value="S">Talla S</option>
           <option value="M">Talla M</option>
           <option value="L">Talla L</option>
         </select>
-        <button onclick="addToCart('Pisco sour shirt', 54.90, document.getElementById('pisco-size').value)">Agregar al carrito</button>
+        <button onclick="addToCart('Pisco sour shirt', 59.90, document.getElementById('pisco-size').value)">Agregar al carrito</button>
       </div>
+
     </div>
   </section>
 
+  <!-- Carrito -->
   <section id="carrito">
     <h2>Carrito de compras</h2>
     <div id="cart-items"></div>
@@ -113,9 +212,23 @@
     <button onclick="checkout()">Realizar pago</button>
   </section>
 
+  <!-- Pago (opcional, ya no se usa si usas checkout directo) -->
+  <section id="pago" style="display:none;">
+    <h2>Medios de pago</h2>
+    <p style="text-align:center; font-size:18px; margin-bottom:20px;">
+      Enviar captura de Yape o transferencia a este número: <strong>958960893</strong>
+    </p>
+    <div class="payment">
+      <img src="img/qr-yape.png" alt="QR Yape">
+      <img src="img/qr-transferencia.png" alt="QR Transferencia">
+    </div>
+  </section>
+
+  <!-- Script -->
   <script>
     let cart = [];
 
+    // Links de Culqi por producto y talla (tal como me pasaste)
     const culqiLinks = {
       "Drift into adventure shirt": { S: "https://express.culqi.com/pago/4XR759TFKR", M: "https://express.culqi.com/pago/8TH3QXWLNK", L: "https://express.culqi.com/pago/OC166GW63C" },
       "True style shirt": { S: "https://express.culqi.com/pago/QFPW93XY8O", M: "https://express.culqi.com/pago/EUG6FWG6G8", L: "https://express.culqi.com/pago/10BIBI0YXF" },
@@ -126,7 +239,8 @@
 
     function showSection(id) {
       document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
     }
 
     function addToCart(product, price, size) {
@@ -152,23 +266,53 @@
 
       cartDiv.innerHTML = "<ul>" + cart.map((item, i) => 
         `<li>${item.product} (${item.size}) - S/ ${item.price.toFixed(2)} 
-        <button class="remove-btn" onclick="removeFromCart(${i})">❌</button></li>`
+         <button class="remove-btn" onclick="removeFromCart(${i})">❌</button></li>`
       ).join('') + "</ul>";
 
       let total = cart.reduce((sum, item) => sum + item.price, 0);
       cartTotal.textContent = "Total: S/ " + total.toFixed(2);
     }
 
+    // Abre los links de Culqi para cada item en el carrito (en pestañas nuevas)
     function checkout() {
       if (cart.length === 0) {
         alert("Tu carrito está vacío.");
         return;
       }
+
+      // Aviso opcional al usuario
+      if (!confirm("Se abrirán pestañas para completar el pago en Culqi. ¿Continuar?")) return;
+
       cart.forEach(item => {
-        const link = culqiLinks[item.product][item.size];
-        if (link) window.open(link, "_blank");
+        const link = culqiLinks[item.product] && culqiLinks[item.product][item.size];
+        if (link) {
+          window.open(link, "_blank");
+        } else {
+          console.warn("No hay link para:", item.product, item.size);
+        }
       });
     }
+
+    // Función genérica para mover slides
+    function moveSlide(carouselId, step) {
+      const carousel = document.getElementById(carouselId);
+      if (!carousel) return;
+      const slides = carousel.querySelectorAll("img");
+      if (!slides.length) return;
+      let index = [...slides].findIndex(img => img.classList.contains("active"));
+      if (index === -1) index = 0;
+      slides[index].classList.remove("active");
+      index = (index + step + slides.length) % slides.length;
+      slides[index].classList.add("active");
+    }
+
+    // Auto-slide en inicio cada 5s
+    setInterval(() => {
+      moveSlide("inicio-carousel", 1);
+    }, 5000);
+
+    // Inicializar (muestra carrito vacío)
+    renderCart();
   </script>
 </body>
 </html>
