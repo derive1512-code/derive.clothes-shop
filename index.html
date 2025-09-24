@@ -5,212 +5,197 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dérive Store</title>
   <style>
-    body {margin:0;font-family:Arial, sans-serif;background:#f4f4f4;color:#333;}
-    header {background:#111;color:white;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;}
-    header img {height:50px;}
-    nav a {color:white;text-decoration:none;margin:0 10px;font-weight:bold;}
-    .carousel {position:relative;max-width:100%;overflow:hidden;}
-    .carousel img {width:100%;display:none;}
-    .carousel img.active {display:block;}
-    .carousel button {position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);color:white;border:none;font-size:2em;cursor:pointer;padding:5px 10px;}
-    .carousel .prev {left:10px;}
-    .carousel .next {right:10px;}
-    .products {display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;padding:20px;}
-    .product {background:white;padding:10px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.1);text-align:center;}
-    .product img {width:100%;border-radius:8px;cursor:pointer;}
-    .product h3 {margin:10px 0;}
-    .cart {position:fixed;top:0;right:0;width:300px;height:100%;background:white;box-shadow:-2px 0 5px rgba(0,0,0,0.2);padding:20px;transform:translateX(100%);transition:transform 0.3s ease;overflow-y:auto;z-index:1000;}
-    .cart.open {transform:translateX(0);}
-    .cart h2 {margin-top:0;}
-    .cart-item {display:flex;justify-content:space-between;margin:10px 0;padding:10px;background:#f9f9f9;border-radius:5px;}
-    .cart .total {font-weight:bold;margin:15px 0;}
-    .close-cart {background:red;color:white;border:none;padding:5px 10px;cursor:pointer;float:right;}
-    .modal {display:none;position:fixed;z-index:2000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.8);}
-    .modal-content {background:white;margin:5% auto;padding:20px;border-radius:8px;width:90%;max-width:600px;position:relative;}
-    .modal .close {position:absolute;top:10px;right:20px;font-size:24px;cursor:pointer;}
-    .modal .carousel img {max-height:300px;object-fit:contain;}
-    .sizes button {margin:5px;padding:10px 15px;cursor:pointer;border:1px solid #111;border-radius:5px;}
-    .pay-links a {display:inline-block;margin:5px;padding:10px 15px;background:#111;color:white;text-decoration:none;border-radius:5px;}
+    body { font-family: Arial, sans-serif; margin:0; padding:0; }
+    header { display:flex; align-items:center; justify-content:space-between; background:#111; padding:10px 20px; color:#fff; }
+    header img { height:50px; }
+    .carousel { position:relative; max-width:100%; margin:auto; overflow:hidden; }
+    .carousel img { width:100%; display:none; }
+    .carousel img.active { display:block; }
+    .carousel button { position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.5); color:#fff; border:none; padding:10px; cursor:pointer; }
+    .carousel .prev { left:10px; }
+    .carousel .next { right:10px; }
+    .products { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; padding:20px; }
+    .product { border:1px solid #ddd; padding:10px; text-align:center; border-radius:10px; }
+    .product h3 { margin:10px 0; }
+    .sizes button { margin:5px; padding:8px 12px; cursor:pointer; }
+    #cart { position:fixed; right:0; top:0; width:300px; height:100%; background:#f9f9f9; border-left:1px solid #ddd; padding:20px; overflow-y:auto; display:none; }
+    #cart h2 { margin-top:0; }
+    #cartItems { margin-bottom:20px; }
+    #cart button { width:100%; padding:10px; margin-top:10px; cursor:pointer; }
   </style>
 </head>
 <body>
 
-<header>
-  <img src="logo.png" alt="Logo Dérive">
-  <nav>
-    <a href="#">Inicio</a>
-    <a href="#">Tienda</a>
-    <a href="#" onclick="toggleCart()">Carrito 🛒</a>
-  </nav>
-</header>
+  <!-- Header -->
+  <header>
+    <img src="logo.png" alt="Logo">
+    <button onclick="toggleCart()">🛒 Carrito</button>
+  </header>
 
-<!-- Carrusel de inicio con 14 imágenes -->
-<div class="carousel" id="mainCarousel">
-  <img src="inicio1.png" class="active" alt="slide1">
-  <img src="inicio2.png" alt="slide2">
-  <img src="inicio3.png" alt="slide3">
-  <img src="inicio4.png" alt="slide4">
-  <img src="inicio5.png" alt="slide5">
-  <img src="inicio6.png" alt="slide6">
-  <img src="inicio7.png" alt="slide7">
-  <img src="inicio8.png" alt="slide8">
-  <img src="inicio9.png" alt="slide9">
-  <img src="inicio10.png" alt="slide10">
-  <img src="inicio11.png" alt="slide11">
-  <img src="inicio12.png" alt="slide12">
-  <img src="inicio13.png" alt="slide13">
-  <img src="inicio14.png" alt="slide14">
-  <button class="prev" onclick="moveSlide('mainCarousel',-1)">❮</button>
-  <button class="next" onclick="moveSlide('mainCarousel',1)">❯</button>
-</div>
-
-<!-- Productos -->
-<div class="products" id="products"></div>
-
-<!-- Carrito -->
-<div class="cart" id="cart">
-  <button class="close-cart" onclick="toggleCart()">X</button>
-  <h2>Carrito</h2>
-  <div id="cartItems"></div>
-  <div class="total" id="cartTotal">Total: S/ 0.00</div>
-</div>
-
-<!-- Modal -->
-<div class="modal" id="productModal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <h2 id="modalTitle"></h2>
-    <div class="carousel" id="modalCarousel"></div>
-    <p id="modalDescription"></p>
-    <div class="sizes" id="modalSizes"></div>
-    <div class="pay-links" id="modalLinks"></div>
+  <!-- Carrusel de inicio con 14 fotos -->
+  <div class="carousel" id="mainCarousel">
+    <img src="inicio1.png" class="active" alt="slide1">
+    <img src="inicio2.png" alt="slide2">
+    <img src="inicio3.png" alt="slide3">
+    <img src="inicio4.png" alt="slide4">
+    <img src="inicio5.png" alt="slide5">
+    <img src="inicio6.png" alt="slide6">
+    <img src="inicio7.png" alt="slide7">
+    <img src="inicio8.png" alt="slide8">
+    <img src="inicio9.png" alt="slide9">
+    <img src="inicio10.png" alt="slide10">
+    <img src="inicio11.png" alt="slide11">
+    <img src="inicio12.png" alt="slide12">
+    <img src="inicio13.png" alt="slide13">
+    <img src="inicio14.png" alt="slide14">
+    <button class="prev" onclick="moveSlide('mainCarousel',-1)">❮</button>
+    <button class="next" onclick="moveSlide('mainCarousel',1)">❯</button>
   </div>
-</div>
 
-<script>
-const products = {
-  drift: {
-    name: "Drift into Adventure",
-    price: 59.90,
-    description: "Diseño exclusivo inspirado en la libertad de la aventura.",
-    images: ["drift1.png","drift2.png","drift3.png","drift4.png"],
-    links: {
-      s: "https://express.culqi.com/pago/4XR759TFKR",
-      m: "https://express.culqi.com/pago/8TH3QXWLNK",
-      l: "https://express.culqi.com/pago/OC166GW63C"
-    }
-  },
-  true: {
-    name: "True Style",
-    price: 59.90,
-    description: "La esencia del estilo urbano en una sola prenda.",
-    images: ["true1.png","true2.png","true3.png","true4.png"],
-    links: {
-      s: "https://express.culqi.com/pago/QFPW93XY8O",
-      m: "https://express.culqi.com/pago/EUG6FWG6G8",
-      l: "https://express.culqi.com/pago/10BIBI0YXF"
-    }
-  },
-  strive: {
-    name: "Strive for the Future",
-    price: 59.90,
-    description: "Superación y visión en un diseño único.",
-    images: ["strive1.png","strive2.png","strive3.png"],
-    links: {
-      s: "https://express.culqi.com/pago/Z7WU1QZM5G",
-      m: "https://express.culqi.com/pago/C8FFVNC1MY",
-      l: "https://express.culqi.com/pago/AR0YFZMUX2"
-    }
-  },
-  boundless: {
-    name: "Boundless Style",
-    price: 59.90,
-    description: "Un estilo que no conoce límites.",
-    images: ["boundless1.png","boundless2.png","boundless3.png","boundless4.png"],
-    links: {
-      s: "https://express.culqi.com/pago/F7E5CGA5JY",
-      m: "https://express.culqi.com/pago/UUHHRQZSYM",
-      l: "https://express.culqi.com/pago/HCFOKDYRCM"
-    }
-  },
-  pisco: {
-    name: "Pisco Sour",
-    price: 59.90,
-    description: "Un homenaje al clásico peruano.",
-    images: ["pisco1.png","pisco2.png","pisco3.png","pisco4.png"],
-    links: {
-      s: "https://express.culqi.com/pago/QC4GCS9NIP",
-      m: "https://express.culqi.com/pago/NKQT58SKAV",
-      l: "https://express.culqi.com/pago/9SOBG18T5U"
-    }
-  }
-};
+  <!-- Productos -->
+  <div class="products">
+    <!-- Drift into Adventure -->
+    <div class="product">
+      <h3>Drift into Adventure</h3>
+      <div class="carousel" id="driftCarousel">
+        <img src="drift1.png" class="active" alt="drift1">
+        <img src="drift2.png" alt="drift2">
+        <img src="drift3.png" alt="drift3">
+        <img src="drift4.png" alt="drift4">
+        <button class="prev" onclick="moveSlide('driftCarousel',-1)">❮</button>
+        <button class="next" onclick="moveSlide('driftCarousel',1)">❯</button>
+      </div>
+      <div class="sizes">
+        <button onclick="addToCart('Drift into Adventure - S','https://express.culqi.com/pago/4XR759TFKR')">S</button>
+        <button onclick="addToCart('Drift into Adventure - M','https://express.culqi.com/pago/8TH3QXWLNK')">M</button>
+        <button onclick="addToCart('Drift into Adventure - L','https://express.culqi.com/pago/OC166GW63C')">L</button>
+      </div>
+    </div>
 
-let cart = [];
+    <!-- True Style -->
+    <div class="product">
+      <h3>True Style</h3>
+      <div class="carousel" id="trueCarousel">
+        <img src="true1.png" class="active" alt="true1">
+        <img src="true2.png" alt="true2">
+        <img src="true3.png" alt="true3">
+        <img src="true4.png" alt="true4">
+        <button class="prev" onclick="moveSlide('trueCarousel',-1)">❮</button>
+        <button class="next" onclick="moveSlide('trueCarousel',1)">❯</button>
+      </div>
+      <div class="sizes">
+        <button onclick="addToCart('True Style - S','https://express.culqi.com/pago/QFPW93XY8O')">S</button>
+        <button onclick="addToCart('True Style - M','https://express.culqi.com/pago/EUG6FWG6G8')">M</button>
+        <button onclick="addToCart('True Style - L','https://express.culqi.com/pago/10BIBI0YXF')">L</button>
+      </div>
+    </div>
 
-// Render productos
-const productsDiv = document.getElementById("products");
-productsDiv.innerHTML = Object.entries(products).map(([key,p]) => `
-  <div class="product">
-    <img src="${p.images[0]}" onclick="openModal('${key}')">
-    <h3>${p.name}</h3>
-    <p>S/ ${p.price.toFixed(2)}</p>
-    <button onclick="openModal('${key}')">Ver más</button>
+    <!-- Strive for the Future (3 fotos) -->
+    <div class="product">
+      <h3>Strive for the Future</h3>
+      <div class="carousel" id="striveCarousel">
+        <img src="strive1.png" class="active" alt="strive1">
+        <img src="strive2.png" alt="strive2">
+        <img src="strive3.png" alt="strive3">
+        <button class="prev" onclick="moveSlide('striveCarousel',-1)">❮</button>
+        <button class="next" onclick="moveSlide('striveCarousel',1)">❯</button>
+      </div>
+      <div class="sizes">
+        <button onclick="addToCart('Strive for the Future - S','https://express.culqi.com/pago/Z7WU1QZM5G')">S</button>
+        <button onclick="addToCart('Strive for the Future - M','https://express.culqi.com/pago/C8FFVNC1MY')">M</button>
+        <button onclick="addToCart('Strive for the Future - L','https://express.culqi.com/pago/AR0YFZMUX2')">L</button>
+      </div>
+    </div>
+
+    <!-- Boundless Style -->
+    <div class="product">
+      <h3>Boundless Style</h3>
+      <div class="carousel" id="boundlessCarousel">
+        <img src="boundless1.png" class="active" alt="boundless1">
+        <img src="boundless2.png" alt="boundless2">
+        <img src="boundless3.png" alt="boundless3">
+        <img src="boundless4.png" alt="boundless4">
+        <button class="prev" onclick="moveSlide('boundlessCarousel',-1)">❮</button>
+        <button class="next" onclick="moveSlide('boundlessCarousel',1)">❯</button>
+      </div>
+      <div class="sizes">
+        <button onclick="addToCart('Boundless Style - S','https://express.culqi.com/pago/F7E5CGA5JY')">S</button>
+        <button onclick="addToCart('Boundless Style - M','https://express.culqi.com/pago/UUHHRQZSYM')">M</button>
+        <button onclick="addToCart('Boundless Style - L','https://express.culqi.com/pago/HCFOKDYRCM')">L</button>
+      </div>
+    </div>
+
+    <!-- Pisco Sour -->
+    <div class="product">
+      <h3>Pisco Sour</h3>
+      <div class="carousel" id="piscoCarousel">
+        <img src="pisco1.png" class="active" alt="pisco1">
+        <img src="pisco2.png" alt="pisco2">
+        <img src="pisco3.png" alt="pisco3">
+        <img src="pisco4.png" alt="pisco4">
+        <button class="prev" onclick="moveSlide('piscoCarousel',-1)">❮</button>
+        <button class="next" onclick="moveSlide('piscoCarousel',1)">❯</button>
+      </div>
+      <div class="sizes">
+        <button onclick="addToCart('Pisco Sour - S','https://express.culqi.com/pago/QC4GCS9NIP')">S</button>
+        <button onclick="addToCart('Pisco Sour - M','https://express.culqi.com/pago/NKQT58SKAV')">M</button>
+        <button onclick="addToCart('Pisco Sour - L','https://express.culqi.com/pago/9SOBG18T5U')">L</button>
+      </div>
+    </div>
   </div>
-`).join("");
 
-// Modal
-function openModal(key){
-  const p = products[key];
-  document.getElementById("modalTitle").innerText = `${p.name} — S/ ${p.price.toFixed(2)}`;
-  document.getElementById("modalDescription").innerText = p.description;
-  const modalCarousel = document.getElementById("modalCarousel");
-  modalCarousel.innerHTML = 
-    p.images.map((src,i)=>`<img src="${src}" class="${i===0?'active':''}">`).join('')+
-    `<button class="prev" onclick="moveSlide('modalCarousel',-1)">❮</button>
-     <button class="next" onclick="moveSlide('modalCarousel',1)">❯</button>`;
-  document.getElementById("modalSizes").innerHTML = 
-    ['s','m','l'].map(size => `<button onclick="addToCart('${key}','${size}')">Agregar ${size.toUpperCase()}</button>`).join('');
-  document.getElementById("modalLinks").innerHTML =
-    Object.entries(p.links).map(([size,url]) => 
-      `<a href="${url}" target="_blank">Pagar ${size.toUpperCase()}</a>`).join('');
-  document.getElementById("productModal").style.display="block";
-}
+  <!-- Carrito -->
+  <div id="cart">
+    <h2>Carrito</h2>
+    <div id="cartItems"></div>
+    <button onclick="checkout()">Pagar</button>
+    <button onclick="toggleCart()">Cerrar</button>
+  </div>
 
-function closeModal(){ document.getElementById("productModal").style.display="none"; }
+  <script>
+    // Función para mover slides
+    function moveSlide(carouselId, step) {
+      const carousel = document.getElementById(carouselId);
+      const slides = carousel.querySelectorAll("img");
+      let currentIndex = Array.from(slides).findIndex(img => img.classList.contains("active"));
+      slides[currentIndex].classList.remove("active");
+      let newIndex = (currentIndex + step + slides.length) % slides.length;
+      slides[newIndex].classList.add("active");
+    }
 
-// Carrito
-function addToCart(key,size){
-  cart.push({key,size});
-  renderCart();
-  alert("Agregado al carrito");
-}
-function removeFromCart(i){ cart.splice(i,1); renderCart(); }
-function renderCart(){
-  const c=document.getElementById("cartItems");
-  if(cart.length===0){c.innerHTML="<p>Carrito vacío</p>";document.getElementById("cartTotal").innerText="Total: S/ 0.00";return;}
-  let total=0;
-  c.innerHTML="<ul>"+cart.map((it,i)=>{const p=products[it.key];total+=p.price;return `
-    <li class="cart-item">
-      <div><b>${p.name}</b><br>Talla ${it.size.toUpperCase()} — S/ ${p.price.toFixed(2)}</div>
-      <button onclick="removeFromCart(${i})">X</button>
-    </li>`}).join('')+"</ul>";
-  document.getElementById("cartTotal").innerText=`Total: S/ ${total.toFixed(2)}`;
-}
-function toggleCart(){ document.getElementById("cart").classList.toggle("open"); }
+    // Auto-slide solo para el carrusel principal
+    setInterval(() => { moveSlide("mainCarousel", 1); }, 4000);
 
-// Carrusel
-function moveSlide(id,dir){
-  const carousel=document.getElementById(id);
-  const imgs=carousel.getElementsByTagName("img");
-  let idx=[...imgs].findIndex(img=>img.classList.contains("active"));
-  imgs[idx].classList.remove("active");
-  idx=(idx+dir+imgs.length)%imgs.length;
-  imgs[idx].classList.add("active");
-}
-setInterval(()=>moveSlide('mainCarousel',1),5000);
-</script>
-
+    // Carrito
+    let cart = [];
+    function addToCart(item, link) {
+      cart.push({item, link});
+      renderCart();
+      toggleCart(true);
+    }
+    function renderCart() {
+      const cartItemsDiv = document.getElementById("cartItems");
+      cartItemsDiv.innerHTML = "";
+      cart.forEach((c, i) => {
+        cartItemsDiv.innerHTML += `<p>${c.item} - <a href="${c.link}" target="_blank">Pagar</a> <button onclick="removeFromCart(${i})">X</button></p>`;
+      });
+    }
+    function removeFromCart(index) {
+      cart.splice(index,1);
+      renderCart();
+    }
+    function toggleCart(forceOpen=false) {
+      const cartDiv = document.getElementById("cart");
+      if(forceOpen){ cartDiv.style.display="block"; return; }
+      cartDiv.style.display = cartDiv.style.display==="block" ? "none":"block";
+    }
+    function checkout() {
+      if(cart.length>0){
+        window.open(cart[0].link, "_blank");
+      } else {
+        alert("Tu carrito está vacío.");
+      }
+    }
+  </script>
 </body>
 </html>
-
