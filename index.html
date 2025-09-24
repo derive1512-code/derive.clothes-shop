@@ -1,214 +1,423 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Dérive - Tienda Online</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dérive - Tienda</title>
   <style>
-    body { font-family: Arial, sans-serif; margin:0; background:#000; color:#fff; }
-    header { padding:15px; text-align:center; }
-    header img { max-height:60px; display:block; margin:auto; }
+    :root { --bg:#000; --card:#111; --muted:#999; --accent:#fff; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--accent)}
+    /* Header sticky con logo centrado */
+    header{position:sticky;top:0;background:#000;padding:8px 12px;z-index:1000;border-bottom:1px solid #111}
+    .logo{display:block;margin:0 auto;max-height:70px}
+    nav{display:flex;justify-content:center;gap:18px;padding:10px 0;background:#000}
+    nav a{color:#fff;text-decoration:none;font-weight:700;cursor:pointer}
+    nav a:hover{text-decoration:underline}
 
-    nav { background:#111; display:flex; justify-content:center; gap:20px; padding:10px; }
-    nav a { color:#fff; text-decoration:none; font-weight:bold; }
-    nav a:hover { text-decoration:underline; }
+    main{max-width:1100px;margin:18px auto;padding:0 12px}
 
-    section { padding:30px; display:none; }
-    section.active { display:block; }
-    h2 { border-bottom:2px solid #333; padding-bottom:10px; margin-bottom:20px; text-align:center; }
+    section{display:none;padding:18px 0}
+    section.active{display:block}
 
-    /* Carrusel inicio */
-    .carousel { position:relative; max-width:500px; margin:20px auto; overflow:hidden; border-radius:10px; }
-    .carousel img { width:100%; display:none; border-radius:10px; }
-    .carousel img.active { display:block; }
-    .carousel button {
-      position:absolute; top:50%; transform:translateY(-50%);
-      background:rgba(0,0,0,0.6); color:#fff; border:none; padding:10px;
-      cursor:pointer; border-radius:50%;
+    h2{margin:0 0 14px 0;text-align:center;color:#fff;border-bottom:2px solid #222;padding-bottom:10px}
+
+    /* Carrusel inicio (pequeño y centrado) */
+    .carousel{position:relative;margin:18px auto;max-width:560px;border-radius:10px;overflow:hidden;background:#0a0a0a}
+    .carousel img{width:100%;display:none;object-fit:cover}
+    .carousel img.active{display:block}
+    .carousel button{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:0;padding:8px 12px;border-radius:50%;cursor:pointer}
+    .carousel .prev{left:8px}
+    .carousel .next{right:8px}
+
+    /* Socials debajo del carrusel */
+    .socials{display:flex;gap:14px;justify-content:center;margin-top:14px}
+    .socials a{display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;background:#111;color:#fff;text-decoration:none}
+    .socials img{width:28px;height:28px;object-fit:contain}
+
+    /* Productos: grid con mini-carrusel en cada tarjeta */
+    .products{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+    .card{background:var(--card);padding:12px;border-radius:10px;text-align:center}
+    .card .mini-carousel{position:relative;overflow:hidden;border-radius:8px;background:#080808;height:180px;display:flex;align-items:center;justify-content:center}
+    .mini-carousel img{max-width:100%;max-height:170px;display:none;object-fit:contain}
+    .mini-carousel img.active{display:block}
+    .mini-carousel button{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:0;padding:6px;border-radius:50%;cursor:pointer}
+    .mini-carousel .prev{left:6px}
+    .mini-carousel .next{right:6px}
+    .card h3{margin:10px 0 6px 0;font-size:16px;cursor:pointer}
+    .price{color:var(--muted);margin-bottom:8px}
+
+    .card .ver-btn{margin-top:8px;padding:8px 12px;border-radius:6px;background:#fff;color:#000;border:0;cursor:pointer}
+    .card .ver-btn:hover{opacity:.95}
+
+    /* Modal (oscurece el fondo) */
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;z-index:2000}
+    .modal.open{display:flex}
+    .modal-box{background:#0f0f0f;padding:18px;border-radius:10px;max-width:540px;width:92%;text-align:center;position:relative}
+    .modal-box h3{margin:0 0 12px 0}
+    .modal-carousel{position:relative;margin-bottom:12px}
+    .modal-carousel img{width:100%;display:none;object-fit:contain;border-radius:8px}
+    .modal-carousel img.active{display:block}
+    .modal-carousel button{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:0;padding:8px;border-radius:50%;cursor:pointer}
+    .modal-carousel .prev{left:6px}
+    .modal-carousel .next{right:6px}
+    .sizes{display:flex;gap:8px;justify-content:center;margin-top:8px}
+    .sizes button{padding:8px 12px;border-radius:8px;border:1px solid #333;background:#111;color:#fff;cursor:pointer}
+    .sizes button.active{background:#fff;color:#000;border-color:#fff}
+    .modal-actions{display:flex;gap:10px;justify-content:center;margin-top:12px}
+    .btn-primary{background:#fff;color:#000;padding:10px 14px;border-radius:8px;border:0;cursor:pointer}
+    .btn-secondary{background:#27ae60;color:#fff;padding:10px 14px;border-radius:8px;border:0;cursor:pointer}
+
+    .close-x{position:absolute;right:10px;top:6px;color:#fff;font-size:20px;background:transparent;border:0;cursor:pointer}
+
+    /* Carrito flotante / sección */
+    .cart-list{max-width:900px;margin:0 auto}
+    .cart-list ul{list-style:none;padding:0;margin:0}
+    .cart-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;background:#0e0e0e;margin-bottom:8px}
+    .cart-item .meta{color:var(--muted)}
+    .remove-btn{background:#c0392b;color:#fff;border:0;padding:6px 8px;border-radius:6px;cursor:pointer}
+
+    /* Responsive */
+    @media(max-width:640px){
+      .modal-box{padding:12px}
+      .mini-carousel{height:150px}
+      .carousel{max-width:92%}
     }
-    .carousel .prev { left:10px; }
-    .carousel .next { right:10px; }
-
-    /* Redes sociales */
-    .socials { margin-top:20px; display:flex; gap:20px; justify-content:center; }
-    .socials a { display:flex; align-items:center; gap:10px; background:#111; padding:10px 20px; border-radius:30px; color:#fff; text-decoration:none; transition:0.3s; }
-    .socials a:hover { background:#333; }
-    .socials img { width:24px; height:24px; }
-
-    /* Productos */
-    .products { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; }
-    .product { background:#111; padding:15px; border-radius:10px; text-align:center; cursor:pointer; }
-    .product h3 { margin-bottom:15px; }
-
-    /* Modal */
-    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content:center; align-items:center; z-index:1000; }
-    .modal-content { background:#111; padding:20px; border-radius:10px; text-align:center; width:90%; max-width:500px; }
-    .modal h3 { margin-bottom:15px; }
-    .close { position:absolute; top:20px; right:30px; font-size:30px; cursor:pointer; color:#fff; }
-
-    .sizes { margin:15px 0; }
-    .sizes button {
-      margin:5px; padding:10px 15px; border:none; border-radius:5px;
-      cursor:pointer; background:#333; color:#fff;
-    }
-    .sizes button.active { background:#fff; color:#000; }
-
-    .modal button.add { margin-top:15px; background:#fff; color:#000; padding:10px 20px; border:none; border-radius:5px; cursor:pointer; }
-    .modal button.add:hover { background:#ddd; }
-
-    /* Carrito */
-    #cart-items { margin-top:20px; }
-    #cart-items ul { list-style:none; padding:0; }
-    #cart-items li { margin:10px 0; background:#111; padding:10px; border-radius:5px; }
   </style>
 </head>
 <body>
-  <!-- Logo -->
+  <!-- Header con logo centrado y sticky -->
   <header>
-    <img src="logo.png" alt="Logo de la marca">
+    <img src="logo.png" alt="Logo Dérive" class="logo">
+    <nav>
+      <a onclick="showSection('inicio')">Inicio</a>
+      <a onclick="showSection('productos')">Productos</a>
+      <a onclick="showSection('carrito')">Carrito</a>
+    </nav>
   </header>
 
-  <!-- Menú -->
-  <nav>
-    <a href="#" onclick="showSection('inicio')">Inicio</a>
-    <a href="#" onclick="showSection('productos')">Productos</a>
-    <a href="#" onclick="showSection('carrito')">Carrito</a>
-  </nav>
-
-  <!-- Inicio -->
-  <section id="inicio" class="active">
-    <h2>Bienvenido a Dérive</h2>
-    <div class="carousel" id="inicio-carousel">
-      <img src="img/inicio1.jpg" class="active" alt="">
-      <img src="img/inicio2.jpg" alt="">
-      <img src="img/inicio3.jpg" alt="">
-      <img src="img/inicio4.jpg" alt="">
-      <img src="img/inicio5.jpg" alt="">
-      <img src="img/inicio6.jpg" alt="">
-      <img src="img/inicio7.jpg" alt="">
-      <img src="img/inicio8.jpg" alt="">
-      <img src="img/inicio9.jpg" alt="">
-      <img src="img/inicio10.jpg" alt="">
-      <img src="img/inicio11.jpg" alt="">
-      <img src="img/inicio12.jpg" alt="">
-      <img src="img/inicio13.jpg" alt="">
-      <img src="img/inicio14.jpg" alt="">
-      <button class="prev" onclick="moveSlide('inicio-carousel', -1)">❮</button>
-      <button class="next" onclick="moveSlide('inicio-carousel', 1)">❯</button>
-    </div>
-    <div class="socials">
-      <a href="https://www.instagram.com/derive_clothesz" target="_blank">
-        <img src="img/instagram.png" alt=""> @derive_clothesz
-      </a>
-      <a href="https://www.tiktok.com/@derive_clothesz" target="_blank">
-        <img src="img/tiktok.png" alt=""> @derive_clothesz
-      </a>
-    </div>
-  </section>
-
-  <!-- Productos -->
-  <section id="productos">
-    <h2>Productos</h2>
-    <div class="products">
-      <div class="product" onclick="openModal('Drift into adventure shirt',['img/drift1.jpg','img/drift2.jpg','img/drift3.jpg'],54.90)">
-        <h3>Drift into adventure</h3>
+  <main>
+    <!-- INICIO: carrusel pequeño y centrado + redes -->
+    <section id="inicio" class="active">
+      <h2>Bienvenido a Dérive</h2>
+      <div class="carousel" id="inicio-carousel">
+        <img src="img/inicio1.jpg" class="active" alt="inicio1">
+        <img src="img/inicio2.jpg" alt="inicio2">
+        <img src="img/inicio3.jpg" alt="inicio3">
+        <img src="img/inicio4.jpg" alt="inicio4">
+        <img src="img/inicio5.jpg" alt="inicio5">
+        <img src="img/inicio6.jpg" alt="inicio6">
+        <img src="img/inicio7.jpg" alt="inicio7">
+        <img src="img/inicio8.jpg" alt="inicio8">
+        <img src="img/inicio9.jpg" alt="inicio9">
+        <img src="img/inicio10.jpg" alt="inicio10">
+        <img src="img/inicio11.jpg" alt="inicio11">
+        <img src="img/inicio12.jpg" alt="inicio12">
+        <img src="img/inicio13.jpg" alt="inicio13">
+        <img src="img/inicio14.jpg" alt="inicio14">
+        <button class="prev" onclick="moveSlide('inicio-carousel', -1)">❮</button>
+        <button class="next" onclick="moveSlide('inicio-carousel', 1)">❯</button>
       </div>
-      <div class="product" onclick="openModal('True style shirt',['img/true1.jpg','img/true2.jpg','img/true3.jpg'],54.90)">
-        <h3>True style</h3>
-      </div>
-      <div class="product" onclick="openModal('Strive for the future shirt',['img/strive1.jpg','img/strive2.jpg','img/strive3.jpg'],49.90)">
-        <h3>Strive for the future</h3>
-      </div>
-    </div>
-  </section>
 
-  <!-- Carrito -->
-  <section id="carrito">
-    <h2>Carrito</h2>
-    <div id="cart-items"></div>
-  </section>
-
-  <!-- Modal producto -->
-  <div id="productModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h3 id="modal-title"></h3>
-      <div class="carousel" id="modal-carousel"></div>
-      <div class="sizes">
-        <button onclick="selectSize(this)">S</button>
-        <button onclick="selectSize(this)">M</button>
-        <button onclick="selectSize(this)">L</button>
+      <div class="socials">
+        <a href="https://www.instagram.com/derive_clothesz" target="_blank">
+          <img src="img/instagram.png" alt="IG"> @derive_clothesz
+        </a>
+        <a href="https://www.tiktok.com/@derive_clothesz" target="_blank">
+          <img src="img/tiktok.png" alt="TT"> @derive_clothesz
+        </a>
       </div>
-      <button class="add" onclick="addToCart()">Agregar al carrito</button>
+    </section>
+
+    <!-- PRODUCTOS: grilla con mini-carruseles y precio -->
+    <section id="productos">
+      <h2>Productos</h2>
+      <div class="products">
+
+        <!-- Drift (4 fotos) -->
+        <div class="card">
+          <div class="mini-carousel" id="drift-carousel">
+            <img src="img/drift1.jpg" class="active" alt="drift1">
+            <img src="img/drift2.jpg" alt="drift2">
+            <img src="img/drift3.jpg" alt="drift3">
+            <img src="img/drift4.jpg" alt="drift4">
+            <button class="prev" onclick="moveSlide('drift-carousel', -1)">❮</button>
+            <button class="next" onclick="moveSlide('drift-carousel', 1)">❯</button>
+          </div>
+          <h3 onclick="openModal('drift')">Drift into adventure</h3>
+          <div class="price">S/ 54.90</div>
+          <button class="ver-btn" onclick="openModal('drift')">Ver producto</button>
+        </div>
+
+        <!-- True (4 fotos) -->
+        <div class="card">
+          <div class="mini-carousel" id="true-carousel">
+            <img src="img/true1.jpg" class="active" alt="true1">
+            <img src="img/true2.jpg" alt="true2">
+            <img src="img/true3.jpg" alt="true3">
+            <img src="img/true4.jpg" alt="true4">
+            <button class="prev" onclick="moveSlide('true-carousel', -1)">❮</button>
+            <button class="next" onclick="moveSlide('true-carousel', 1)">❯</button>
+          </div>
+          <h3 onclick="openModal('true')">True style</h3>
+          <div class="price">S/ 54.90</div>
+          <button class="ver-btn" onclick="openModal('true')">Ver producto</button>
+        </div>
+
+        <!-- Strive (3 fotos) -->
+        <div class="card">
+          <div class="mini-carousel" id="strive-carousel">
+            <img src="img/strive1.jpg" class="active" alt="strive1">
+            <img src="img/strive2.jpg" alt="strive2">
+            <img src="img/strive3.jpg" alt="strive3">
+            <button class="prev" onclick="moveSlide('strive-carousel', -1)">❮</button>
+            <button class="next" onclick="moveSlide('strive-carousel', 1)">❯</button>
+          </div>
+          <h3 onclick="openModal('strive')">Strive for the future</h3>
+          <div class="price">S/ 49.90</div>
+          <button class="ver-btn" onclick="openModal('strive')">Ver producto</button>
+        </div>
+
+        <!-- Boundless (4 fotos) -->
+        <div class="card">
+          <div class="mini-carousel" id="boundless-carousel">
+            <img src="img/boundless1.jpg" class="active" alt="boundless1">
+            <img src="img/boundless2.jpg" alt="boundless2">
+            <img src="img/boundless3.jpg" alt="boundless3">
+            <img src="img/boundless4.jpg" alt="boundless4">
+            <button class="prev" onclick="moveSlide('boundless-carousel', -1)">❮</button>
+            <button class="next" onclick="moveSlide('boundless-carousel', 1)">❯</button>
+          </div>
+          <h3 onclick="openModal('boundless')">Boundless style</h3>
+          <div class="price">S/ 54.90</div>
+          <button class="ver-btn" onclick="openModal('boundless')">Ver producto</button>
+        </div>
+
+        <!-- Pisco (4 fotos) -->
+        <div class="card">
+          <div class="mini-carousel" id="pisco-carousel">
+            <img src="img/pisco1.jpg" class="active" alt="pisco1">
+            <img src="img/pisco2.jpg" alt="pisco2">
+            <img src="img/pisco3.jpg" alt="pisco3">
+            <img src="img/pisco4.jpg" alt="pisco4">
+            <button class="prev" onclick="moveSlide('pisco-carousel', -1)">❮</button>
+            <button class="next" onclick="moveSlide('pisco-carousel', 1)">❯</button>
+          </div>
+          <h3 onclick="openModal('pisco')">Pisco sour</h3>
+          <div class="price">S/ 59.90</div>
+          <button class="ver-btn" onclick="openModal('pisco')">Ver producto</button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CARRITO -->
+    <section id="carrito">
+      <h2>Carrito</h2>
+      <div class="cart-list">
+        <div id="cart-items"><p style="color:var(--muted);text-align:center">El carrito está vacío</p></div>
+        <div style="text-align:center;margin-top:12px">
+          <button class="btn-secondary" onclick="checkout()">Pagar (Culqi)</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL (producto seleccionado) -->
+  <div id="productModal" class="modal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="close-x" onclick="closeModal()">✕</button>
+      <h3 id="modalTitle">Producto</h3>
+
+      <div class="modal-carousel" id="modal-carousel">
+        <!-- imágenes se inyectan desde JS -->
+      </div>
+
+      <div class="sizes" id="modal-sizes">
+        <button onclick="selectModalSize('S', this)">S</button>
+        <button onclick="selectModalSize('M', this)">M</button>
+        <button onclick="selectModalSize('L', this)">L</button>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-primary" onclick="addToCartFromModal()">Añadir al carrito</button>
+        <button class="btn-secondary" onclick="buyNowFromModal()">Comprar ahora</button>
+      </div>
     </div>
   </div>
 
   <script>
-    let cart = [];
-    let currentSize = null;
-    let currentProduct = null;
-    let currentPrice = 0;
+    // Datos centrales (rutas con img/)
+    const products = {
+      drift: {
+        key: 'drift',
+        name: 'Drift into adventure',
+        price: 54.90,
+        images: ['img/drift1.jpg','img/drift2.jpg','img/drift3.jpg','img/drift4.jpg'],
+        links: { S: 'https://express.culqi.com/pago/4XR759TFKR', M: 'https://express.culqi.com/pago/8TH3QXWLNK', L: 'https://express.culqi.com/pago/OC166GW63C' }
+      },
+      true: {
+        key: 'true',
+        name: 'True style',
+        price: 54.90,
+        images: ['img/true1.jpg','img/true2.jpg','img/true3.jpg','img/true4.jpg'],
+        links: { S: 'https://express.culqi.com/pago/QFPW93XY8O', M: 'https://express.culqi.com/pago/EUG6FWG6G8', L: 'https://express.culqi.com/pago/10BIBI0YXF' }
+      },
+      strive: {
+        key: 'strive',
+        name: 'Strive for the future',
+        price: 49.90,
+        images: ['img/strive1.jpg','img/strive2.jpg','img/strive3.jpg'],
+        links: { S: 'https://express.culqi.com/pago/Z7WU1QZM5G', M: 'https://express.culqi.com/pago/C8FFVNC1MY', L: 'https://express.culqi.com/pago/AR0YFZMUX2' }
+      },
+      boundless: {
+        key: 'boundless',
+        name: 'Boundless style',
+        price: 54.90,
+        images: ['img/boundless1.jpg','img/boundless2.jpg','img/boundless3.jpg','img/boundless4.jpg'],
+        links: { S: 'https://express.culqi.com/pago/F7E5CGA5JY', M: 'https://express.culqi.com/pago/UUHHRQZSYM', L: 'https://express.culqi.com/pago/HCFOKDYRCM' }
+      },
+      pisco: {
+        key: 'pisco',
+        name: 'Pisco sour',
+        price: 59.90,
+        images: ['img/pisco1.jpg','img/pisco2.jpg','img/pisco3.jpg','img/pisco4.jpg'],
+        links: { S: 'https://express.culqi.com/pago/QC4GCS9NIP', M: 'https://express.culqi.com/pago/NKQT58SKAV', L: 'https://express.culqi.com/pago/9SOBG18T5U' }
+      }
+    };
 
-    function showSection(id) {
-      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
+    // Estado
+    let cart = []; // { key, size }
+    let modalState = { key: null, selectedSize: null, index: 0 };
+
+    // Mostrar secciones
+    function showSection(id){
+      document.querySelectorAll('main section').forEach(s => s.classList.remove('active'));
+      const el = document.getElementById(id);
+      if(el) el.classList.add('active');
+      // si abrimos carrito actualizamos listado
+      if(id === 'carrito') renderCart();
     }
 
-    function moveSlide(carouselId, step) {
+    // Move slide para cualquier carousel por id (inicia bien aunque no exista class active)
+    function moveSlide(carouselId, step){
       const carousel = document.getElementById(carouselId);
-      if (!carousel) return;
-      const slides = carousel.querySelectorAll("img");
-      let index = [...slides].findIndex(img => img.classList.contains("active"));
-      slides[index].classList.remove("active");
+      if(!carousel) return;
+      const slides = carousel.querySelectorAll('img');
+      if(!slides.length) return;
+      let index = [...slides].findIndex(img => img.classList.contains('active'));
+      if(index === -1) index = 0;
+      slides[index].classList.remove('active');
       index = (index + step + slides.length) % slides.length;
-      slides[index].classList.add("active");
+      slides[index].classList.add('active');
     }
 
-    // Inicio auto-slide
-    setInterval(() => moveSlide("inicio-carousel", 1), 5000);
+    // Modal: abrir con producto key
+    function openModal(key){
+      const p = products[key];
+      if(!p) return;
+      modalState.key = key;
+      modalState.selectedSize = null;
+      modalState.index = 0;
 
-    function openModal(product, images, price) {
-      currentProduct = product;
-      currentPrice = price;
-      currentSize = null;
+      document.getElementById('modalTitle').innerText = `${p.name} — S/ ${p.price.toFixed(2)}`;
 
-      document.getElementById("modal-title").innerText = product;
-      const modalCarousel = document.getElementById("modal-carousel");
-      modalCarousel.innerHTML = images.map((src,i) => `<img src="${src}" class="${i===0?'active':''}">`).join('')
-        + `<button class="prev" onclick="moveSlide('modal-carousel', -1)">❮</button>
-           <button class="next" onclick="moveSlide('modal-carousel', 1)">❯</button>`;
-      document.getElementById("productModal").style.display = "flex";
+      // crear carousel en modal
+      const modalCarousel = document.getElementById('modal-carousel');
+      modalCarousel.innerHTML = p.images.map((src,i)=>`<img src="${src}" class="${i===0?'active':''}" alt="img${i}">`).join('')
+        + `<button class="prev" onclick="moveSlide('modal-carousel',-1)">❮</button>
+           <button class="next" onclick="moveSlide('modal-carousel',1)">❯</button>`;
+
+      // reset tallas visual
+      document.querySelectorAll('#modal-sizes button').forEach(b=>b.classList.remove('active'));
+      // show modal
+      const modal = document.getElementById('productModal');
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
     }
 
-    function closeModal() {
-      document.getElementById("productModal").style.display = "none";
+    function closeModal(){
+      const modal = document.getElementById('productModal');
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
     }
 
-    function selectSize(btn) {
-      document.querySelectorAll(".sizes button").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      currentSize = btn.innerText;
+    // seleccionar talla dentro del modal
+    function selectModalSize(size, btnEl){
+      modalState.selectedSize = size;
+      document.querySelectorAll('#modal-sizes button').forEach(b=>b.classList.remove('active'));
+      if(btnEl) btnEl.classList.add('active');
     }
 
-    function addToCart() {
-      if (!currentSize) {
-        alert("Selecciona una talla.");
-        return;
-      }
-      cart.push({ product: currentProduct, price: currentPrice, size: currentSize });
-      renderCart();
+    // añadir al carrito desde modal
+    function addToCartFromModal(){
+      if(!modalState.key) return;
+      if(!modalState.selectedSize){ alert('Selecciona una talla'); return; }
+      cart.push({ key: modalState.key, size: modalState.selectedSize });
       closeModal();
+      alert('Añadido: ' + products[modalState.key].name + ' - ' + modalState.selectedSize);
+      renderCart();
     }
 
-    function renderCart() {
-      const cartDiv = document.getElementById("cart-items");
-      if (cart.length === 0) {
-        cartDiv.innerHTML = "<p>El carrito está vacío.</p>";
+    // Comprar ahora desde modal (redirige link Culqi según talla)
+    function buyNowFromModal(){
+      if(!modalState.key) return;
+      if(!modalState.selectedSize){ alert('Selecciona una talla'); return; }
+      const p = products[modalState.key];
+      const link = p.links[modalState.selectedSize];
+      if(link) window.open(link,'_blank');
+      else alert('No hay link para esta talla.');
+    }
+
+    // Carrito: render y eliminar
+    function renderCart(){
+      const container = document.getElementById('cart-items');
+      if(cart.length === 0){
+        container.innerHTML = '<p style="color:var(--muted);text-align:center">El carrito está vacío</p>';
         return;
       }
-      cartDiv.innerHTML = "<ul>" + cart.map(item =>
-        `<li>${item.product} - Talla ${item.size} - S/ ${item.price.toFixed(2)}</li>`
-      ).join("") + "</ul>";
+      container.innerHTML = `<ul>` + cart.map((it,idx) => {
+        const p = products[it.key];
+        return `<li class="cart-item">
+          <div>
+            <div style="font-weight:700">${p.name}</div>
+            <div class="meta">Talla ${it.size} — S/ ${p.price.toFixed(2)}</div>
+          </div>
+          <div>
+            <button class="remove-btn" onclick="removeFromCart(${idx})">Eliminar</button>
+          </div>
+        </li>`;
+      }).join('') + `</ul>`;
     }
+
+    function removeFromCart(i){
+      cart.splice(i,1);
+      renderCart();
+    }
+
+    // Checkout: abre cada link de Culqi en pestañas
+    function checkout(){
+      if(cart.length === 0){ alert('Tu carrito está vacío'); return; }
+      if(!confirm('Se abrirán pestañas para completar el pago en Culqi. ¿Continuar?')) return;
+      cart.forEach(item => {
+        const p = products[item.key];
+        const link = p.links[item.size];
+        if(link) window.open(link, '_blank');
+        else console.warn('Sin link para', p.name, item.size);
+      });
+    }
+
+    // Cerrar modal con Esc y clic afuera
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
+    document.getElementById('productModal').addEventListener('click', e => {
+      if(e.target === document.getElementById('productModal')) closeModal();
+    });
+
+    // Auto-slide inicio (cada 5s)
+    setInterval(()=> moveSlide('inicio-carousel', 1), 5000);
+
+    // Inicial: mostrar inicio por defecto
+    showSection('inicio');
   </script>
 </body>
 </html>
