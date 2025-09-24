@@ -14,18 +14,6 @@
     section.active { display:block; }
     h2 { border-bottom:2px solid #444; padding-bottom:10px; margin-bottom:20px; }
 
-    .carousel { position:relative; max-width:800px; margin:auto; overflow:hidden; border-radius:10px; }
-    .carousel img { width:100%; display:none; border-radius:10px; }
-    .carousel img.active { display:block; }
-    .carousel button {
-      position:absolute; top:50%; transform:translateY(-50%);
-      background:rgba(0,0,0,0.5); color:#fff; border:none; padding:10px;
-      cursor:pointer; border-radius:50%;
-    }
-    .carousel button:hover { background:rgba(0,0,0,0.8); }
-    .carousel .prev { left:10px; }
-    .carousel .next { right:10px; }
-
     .products { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; }
     .product { background:#222; padding:15px; border-radius:10px; text-align:center; }
     .product h3 { margin-bottom:15px; }
@@ -34,7 +22,12 @@
     .product button:hover { background:#ddd; }
     .product select { margin-top:10px; padding:5px; }
 
-    #cart-items { margin-top:20px; }
+    #cart-items ul { list-style:none; padding:0; }
+    #cart-items li { margin:8px 0; background:#222; padding:10px; border-radius:5px; display:flex; justify-content:space-between; align-items:center; }
+    .remove-btn { background:red; color:white; border:none; border-radius:5px; padding:5px 10px; cursor:pointer; }
+    .remove-btn:hover { background:darkred; }
+
+    #cart-total { margin-top:15px; font-weight:bold; }
   </style>
 </head>
 <body>
@@ -50,20 +43,12 @@
 
   <section id="inicio" class="active">
     <h2>Bienvenido a nuestra tienda</h2>
-    <div class="carousel" id="inicio-carousel">
-      <img src="img/inicio1.jpg" class="active">
-      <img src="img/inicio2.jpg">
-      <img src="img/inicio3.jpg">
-      <button class="prev" onclick="moveSlide('inicio-carousel', -1)">❮</button>
-      <button class="next" onclick="moveSlide('inicio-carousel', 1)">❯</button>
-    </div>
+    <p>Explora nuestros modelos y encuentra tu estilo. 👕</p>
   </section>
 
   <section id="productos">
     <h2>Productos</h2>
     <div class="products">
-
-      <!-- Drift -->
       <div class="product">
         <h3>Drift into adventure shirt</h3>
         <p>Precio: S/ 54.90</p>
@@ -75,7 +60,6 @@
         <button onclick="addToCart('Drift into adventure shirt', 54.90, document.getElementById('drift-size').value)">Agregar al carrito</button>
       </div>
 
-      <!-- True style -->
       <div class="product">
         <h3>True style shirt</h3>
         <p>Precio: S/ 54.90</p>
@@ -87,19 +71,17 @@
         <button onclick="addToCart('True style shirt', 54.90, document.getElementById('true-size').value)">Agregar al carrito</button>
       </div>
 
-      <!-- Strive -->
       <div class="product">
         <h3>Strive for the future shirt</h3>
-        <p>Precio: S/ 49.90</p>
+        <p>Precio: S/ 54.90</p>
         <select id="strive-size">
           <option value="S">Talla S</option>
           <option value="M">Talla M</option>
           <option value="L">Talla L</option>
         </select>
-        <button onclick="addToCart('Strive for the future shirt', 49.90, document.getElementById('strive-size').value)">Agregar al carrito</button>
+        <button onclick="addToCart('Strive for the future shirt', 54.90, document.getElementById('strive-size').value)">Agregar al carrito</button>
       </div>
 
-      <!-- Boundless -->
       <div class="product">
         <h3>Boundless style shirt</h3>
         <p>Precio: S/ 54.90</p>
@@ -111,31 +93,29 @@
         <button onclick="addToCart('Boundless style shirt', 54.90, document.getElementById('boundless-size').value)">Agregar al carrito</button>
       </div>
 
-      <!-- Pisco sour -->
       <div class="product">
         <h3>Pisco sour shirt</h3>
-        <p>Precio: S/ 59.90</p>
+        <p>Precio: S/ 54.90</p>
         <select id="pisco-size">
           <option value="S">Talla S</option>
           <option value="M">Talla M</option>
           <option value="L">Talla L</option>
         </select>
-        <button onclick="addToCart('Pisco sour shirt', 59.90, document.getElementById('pisco-size').value)">Agregar al carrito</button>
+        <button onclick="addToCart('Pisco sour shirt', 54.90, document.getElementById('pisco-size').value)">Agregar al carrito</button>
       </div>
-
     </div>
   </section>
 
   <section id="carrito">
     <h2>Carrito de compras</h2>
     <div id="cart-items"></div>
+    <p id="cart-total"></p>
     <button onclick="checkout()">Realizar pago</button>
   </section>
 
   <script>
     let cart = [];
 
-    // Links de Culqi por producto y talla
     const culqiLinks = {
       "Drift into adventure shirt": { S: "https://express.culqi.com/pago/4XR759TFKR", M: "https://express.culqi.com/pago/8TH3QXWLNK", L: "https://express.culqi.com/pago/OC166GW63C" },
       "True style shirt": { S: "https://express.culqi.com/pago/QFPW93XY8O", M: "https://express.culqi.com/pago/EUG6FWG6G8", L: "https://express.culqi.com/pago/10BIBI0YXF" },
@@ -155,13 +135,28 @@
       alert(product + " Talla " + size + " agregado al carrito.");
     }
 
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      renderCart();
+    }
+
     function renderCart() {
       const cartDiv = document.getElementById('cart-items');
+      const cartTotal = document.getElementById('cart-total');
+
       if (cart.length === 0) {
         cartDiv.innerHTML = "<p>El carrito está vacío.</p>";
+        cartTotal.textContent = "";
         return;
       }
-      cartDiv.innerHTML = "<ul>" + cart.map(item => "<li>" + item.product + " (" + item.size + ") - S/ " + item.price.toFixed(2) + "</li>").join('') + "</ul>";
+
+      cartDiv.innerHTML = "<ul>" + cart.map((item, i) => 
+        `<li>${item.product} (${item.size}) - S/ ${item.price.toFixed(2)} 
+        <button class="remove-btn" onclick="removeFromCart(${i})">❌</button></li>`
+      ).join('') + "</ul>";
+
+      let total = cart.reduce((sum, item) => sum + item.price, 0);
+      cartTotal.textContent = "Total: S/ " + total.toFixed(2);
     }
 
     function checkout() {
@@ -174,17 +169,6 @@
         if (link) window.open(link, "_blank");
       });
     }
-
-    function moveSlide(carouselId, step) {
-      const carousel = document.getElementById(carouselId);
-      const slides = carousel.querySelectorAll("img");
-      let index = [...slides].findIndex(img => img.classList.contains("active"));
-      slides[index].classList.remove("active");
-      index = (index + step + slides.length) % slides.length;
-      slides[index].classList.add("active");
-    }
-
-    setInterval(() => moveSlide("inicio-carousel", 1), 5000);
   </script>
 </body>
 </html>
