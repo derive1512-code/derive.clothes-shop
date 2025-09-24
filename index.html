@@ -88,7 +88,7 @@
 <body>
   <!-- Header con logo centrado y sticky -->
   <header>
-    <img src="logo" alt="Logo Dérive" class="logo">
+    <img src="logo.png" alt="Logo Dérive" class="logo">
     <nav>
       <a onclick="showSection('inicio')">Inicio</a>
       <a onclick="showSection('productos')">Productos</a>
@@ -324,7 +324,7 @@
 
       // crear carousel en modal
       const modalCarousel = document.getElementById('modal-carousel');
-      modalCarousel.innerHTML = p.images.map((src,i)=>`<img src="${src}" class="${i===0?'active':''}" alt="img${i}">`).join('') 
+      modalCarousel.innerHTML = p.images.map((src,i)=>`<img src="${src}" class="${i===0?'active':''}" alt="img${i}">`).join('')
         + `<button class="prev" onclick="moveSlide('modal-carousel',-1)">❮</button>
            <button class="next" onclick="moveSlide('modal-carousel',1)">❯</button>`;
 
@@ -386,7 +386,7 @@
           <div>
             <button class="remove-btn" onclick="removeFromCart(${idx})">Eliminar</button>
           </div>
-        </li>`;
+        </li>`;  
       }).join('') + `</ul>`;
     }
 
